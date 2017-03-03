@@ -1,12 +1,17 @@
+package neuralNetwork;
 import Jama.Matrix;
 import activations.ActivationFunction;
+import activations.ReLU;
 import activations.Sigmoid;
+import dataManager.Data;
+import dataManager.Dataset;
 
 public class NeuralNet {
 	
 	Layer[] layers; 
 	
 	ActivationFunction act = new Sigmoid();
+	//ActivationFunction act = new ReLU();
 	public NeuralNet(int input, int output, int[] hidden){
 		layers = new Layer[hidden.length+1];
 		
@@ -24,16 +29,20 @@ public class NeuralNet {
 	}
 	
 	public void train(Dataset ds){
-		for (int epoch = 0; epoch < 50000; epoch++){
+		
+		int data = ds.getTrainingSize();
+		// 200 pretty good for backprop
+		for (int epoch = 0; epoch < 500; epoch++){
 			ds.shuffleTraining();
 			double mse = 0;
-			for (int i = 0; i < 16; i++){
+			for (int i = 0; i < data; i++){
 				Data d = ds.nextTrainingExample();
 				//layers[0].input = d.getInputVector();
 				Matrix m = layers[0].forwardPass(d.getInputVector());
 				for (int l = 1; l < layers.length; l++){
 					m = layers[l].forwardPass(m);
 				}
+				
 				//m.print(5, 2);
 				Matrix res = d.getOutputVector();
 				
@@ -46,9 +55,13 @@ public class NeuralNet {
 				
 				
 				backprop(err);
+				/*if ((i+1) % (int)(data*1.1) == 0){
+					weightUpdate();
+				}*/
 				weightUpdate();
 			}
-			System.err.println(mse);
+			//weightUpdate();
+			System.err.println(mse/data);
 		}
 	}
 	
@@ -63,6 +76,7 @@ public class NeuralNet {
 		layers[layers.length-1].err = err;
 		for (int l = layers.length-2; l >= 0; l--){
 			layers[l].err = layers[l+1].weights.transpose().times(layers[l+1].err).arrayTimes(act.derivativeEval(layers[l].output));
+			layers[l].sumGradient();
 		}
 	}
 	
@@ -81,9 +95,15 @@ public class NeuralNet {
 		}
 		
 		Matrix ret = new Matrix(m.getRowDimension(), m.getColumnDimension());
+		boolean maxSet = false;
 		for (int i = 0; i < m.getRowDimension(); i++){
 			for (int j = 0; j < m.getColumnDimension(); j++){
-				ret.set(i, j, m.get(i, j) < maxVal ? 0 : 1);
+				if (m.get(i, j) < maxVal || maxSet){
+					ret.set(i, j, 0);
+				}else{
+					ret.set(i, j, 1);
+					maxSet = true;
+				}
 			}
 		}
 		

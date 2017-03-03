@@ -2,18 +2,20 @@ package activations;
 
 import Jama.Matrix;
 
-public class ReLU extends ActivationFunction{
+public class Tanh extends ActivationFunction{
 
 	@Override
 	public double eval(double in) {
 		// TODO Auto-generated method stub
-		return Math.max(in, 0);
+		
+		return Math.tanh(in);
 	}
 	
 	@Override
 	public double derivativeEval(double in) {
 		// TODO Auto-generated method stub
-		return in > 0 ? 1 : 0;
+		double val = eval(in);
+		return 1-(val*val);
 	}
 	
 	@Override

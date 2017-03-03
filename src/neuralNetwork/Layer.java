@@ -19,7 +19,7 @@ public class Layer {
 	Matrix gradSum;
 	
 	
-	double momentumRate = 0.005;
+	//double momentumRate = 0.005;
 	public Layer(int in, int out, ActivationFunction act, boolean output){
 		// add 1 for the bias
 		if (!output)

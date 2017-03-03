@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import Jama.Matrix;
 import activations.Sigmoid;
+import activations.Tanh;
 import dataManager.Data;
 import dataManager.Dataset;
 import neuralNetwork.NeuralNet;
@@ -18,8 +19,9 @@ public class Main {
 
 	public Main(){		
 		Variables.act = new Sigmoid();
-		Variables.learningRate = 0.01;
-		Variables.momentumRate = 0.005;
+		//Variables.act = new Tanh();
+		Variables.learningRate = 0.2;
+		Variables.momentumRate = 0.5;
 		Variables.wUpdate = new Backprop(Variables.learningRate, Variables.momentumRate);
 		//Variables.wUpdate = new RProp();
 		//Variables.wUpdate = new Quickprop();
@@ -51,7 +53,7 @@ public class Main {
 		long tEnd = System.currentTimeMillis();
 		long tDelta = tEnd - tStart;
 		double elapsedSeconds = tDelta / 1000.0;
-		System.err.println("Time to Complete: " + elapsedSeconds);
+		System.out.println("Time to Complete: " + elapsedSeconds);
 		/*ds.setBias(false);
 		ds.addTrainingData(new Data(new double[]{0, 0, 0, 0}, new double[]{0, 1})); // 0
 		ds.addTrainingData(new Data(new double[]{1, 1, 0, 0}, new double[]{0, 1})); // 12

@@ -31,7 +31,7 @@ public class Dataset {
 		if (bias)
 			example.addBias();
 		training.add(example);
-		testing.add(example);
+		//testing.add(example);
 	}
 	
 	public void addTestingData(Data example){

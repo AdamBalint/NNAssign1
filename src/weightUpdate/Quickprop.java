@@ -11,6 +11,7 @@ public class Quickprop extends WeightUpdate{
 	
 	@Override
 	public Matrix getWeightUpdate(Matrix errGrad, Layer l) {
+		errGrad = errGrad.times(-1);
 		if (prevGrad == null){
 			prevGrad = new Matrix(errGrad.getRowDimension(), errGrad.getColumnDimension());
 		}

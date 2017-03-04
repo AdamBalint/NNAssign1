@@ -22,6 +22,7 @@ public class Layer {
 	//double momentumRate = 0.005;
 	public Layer(int in, int out, ActivationFunction act, boolean output){
 		// add 1 for the bias
+		
 		if (!output)
 			weights = new Matrix(out, in);
 		else
@@ -58,13 +59,20 @@ public class Layer {
 	//}
 	
 	public void sumGradient(){
-		Matrix errAtNode = (err.arrayTimes(der)).times(input.transpose());
+		Matrix errAtNode = err.arrayTimes(der);
+		errAtNode = errAtNode.times(input.transpose());
 		gradSum = gradSum.plus(errAtNode);
+		/*Matrix errAtNode = (err.arrayTimes(der)).times(input.transpose());
+		gradSum = gradSum.plus(errAtNode);*/
 		//err = new Matrix(err.getRowDimension(), err.getColumnDimension());
 	}
 	
 	public void weightUpdate(){
-		// -eta*(self.layers[i+1].D.dot(self.layers[i].Z)).T 
+		Matrix change = weightUpdate.getWeightUpdate(gradSum, this);
+		weights = weights.plus(change);
+		lastChange = change.copy();
+		gradSum = new Matrix(gradSum.getRowDimension(), gradSum.getColumnDimension());
+		/*// -eta*(self.layers[i+1].D.dot(self.layers[i].Z)).T 
 		// self.layers[i].W += W_grad
 		
 		//err.arrayTimes(der);
@@ -80,14 +88,14 @@ public class Layer {
 		lastChange = change.copy();
 		//err = new Matrix(err.getRowDimension(), err.getColumnDimension());
 		gradSum = new Matrix(gradSum.getRowDimension(), gradSum.getColumnDimension());
-		//gradSum.minusEquals(gradSum);
+		//gradSum.minusEquals(gradSum);*/
 	}
 	
 	public void initData() {
 		// TODO Auto-generated method stub
 		for (int i = 0; i < weights.getRowDimension(); i++){
 			for (int j = 0; j < weights.getColumnDimension(); j++){
-				weights.set(i, j, Math.random()-0.5);
+				weights.set(i, j, Variables.r.nextDouble()-0.5);
 			}
 		}
 	}

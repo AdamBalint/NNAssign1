@@ -10,11 +10,15 @@ public class Backprop extends WeightUpdate{
 	@Override
 	public Matrix getWeightUpdate(Matrix grad, Layer l) {
 		// TODO Auto-generated method stub
+		
+		return (grad.times(-lr)).plus(l.getLastUpdate().times(mr));
+		
 		//Matrix last = l.getLastUpdate();
 		//if (last == null)
 		//	return grad.times(lr);
+		/*
 		return (grad.times(-lr)).plus(l.getLastUpdate().times(mr));//l.getError().arrayTimes(grad).times(l.getInput().transpose()).times(lr);
-		//return ret;
+		*///return ret;
 	}
 	
 	public Backprop(double learningRate, double momentumRate){

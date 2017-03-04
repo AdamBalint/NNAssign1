@@ -74,8 +74,10 @@ public class NeuralNet {
 
 	public void backprop(Matrix err){
 		layers[layers.length-1].err = err;
+		layers[layers.length-1].sumGradient();
 		for (int l = layers.length-2; l >= 0; l--){
-			layers[l].err = layers[l+1].weights.transpose().times(layers[l+1].err).arrayTimes(act.derivativeEval(layers[l].output));
+			layers[l].err = layers[l+1].weights.transpose().times(layers[l+1].err).
+					arrayTimes(act.derivativeEval(layers[l].output));
 			layers[l].sumGradient();
 		}
 	}

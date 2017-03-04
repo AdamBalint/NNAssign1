@@ -69,11 +69,11 @@ public class Dataset {
 	}
 	
 	public void shuffleTraining(){
-		Collections.shuffle(training);
+		Collections.shuffle(training, Variables.r);
 	}
 	
 	public void shuffleTesting(){
-		Collections.shuffle(testing);
+		Collections.shuffle(testing, Variables.r);
 	}
 
 	public void setBias(boolean b) {

@@ -26,14 +26,15 @@ public class Layer {
 			weights = new Matrix(out, in);
 		else
 			weights = new Matrix(out, in);
-		weightUpdate = Variables.wUpdate.copy(this);
-		//lastChange = new Matrix(weights.getRowDimension(), weights.getColumnDimension());
+		
+		lastChange = new Matrix(weights.getRowDimension(), weights.getColumnDimension());
 		//weightUpdate = new RProp(weights.getRowDimension(), weights.getColumnDimension());
 		//weightUpdate = new Quickprop();//new Quickprop(weights.getRowDimension(), weights.getColumnDimension());
 		//weightUpdate = new Backprop(0.05);
 		this.act = act;
 		this.err = new Matrix(out, 1);
 		gradSum = new Matrix(out, in);
+		weightUpdate = Variables.wUpdate.copy(this);
 	}
 	
 	public Matrix forwardPass(Matrix in){
@@ -57,8 +58,9 @@ public class Layer {
 	//}
 	
 	public void sumGradient(){
-		Matrix errAtNode = err.arrayTimes(der).times(input.transpose()).times(-1);
-		gradSum.plusEquals(errAtNode);
+		Matrix errAtNode = (err.arrayTimes(der)).times(input.transpose());
+		gradSum = gradSum.plus(errAtNode);
+		//err = new Matrix(err.getRowDimension(), err.getColumnDimension());
 	}
 	
 	public void weightUpdate(){
@@ -76,8 +78,9 @@ public class Layer {
 		//change.print(4, 2);
 		weights = weights.plus(change);//.plus(lastChange.times(momentumRate));
 		lastChange = change.copy();
-		err = new Matrix(err.getRowDimension(), err.getColumnDimension());
+		//err = new Matrix(err.getRowDimension(), err.getColumnDimension());
 		gradSum = new Matrix(gradSum.getRowDimension(), gradSum.getColumnDimension());
+		//gradSum.minusEquals(gradSum);
 	}
 	
 	public void initData() {

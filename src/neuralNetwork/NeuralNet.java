@@ -32,7 +32,7 @@ public class NeuralNet {
 		
 		int data = ds.getTrainingSize();
 		// 200 pretty good for backprop
-		for (int epoch = 0; epoch < 1000; epoch++){
+		for (int epoch = 0; epoch < 50; epoch++){
 			ds.shuffleTraining();
 			double mse = 0;
 			for (int i = 0; i < data; i++){
@@ -46,7 +46,7 @@ public class NeuralNet {
 				//m.print(5, 2);
 				Matrix res = d.getOutputVector();
 				
-				Matrix err = res.minus(m);
+				Matrix err = m.minus(res);//res.minus(m);
 				for (int r = 0; r < res.getRowDimension(); r++){
 					for (int c = 0; c < res.getColumnDimension(); c++){
 						mse += Math.pow(err.get(r, c),2);

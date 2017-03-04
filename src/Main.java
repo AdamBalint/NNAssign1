@@ -20,14 +20,14 @@ public class Main {
 	public Main(){		
 		Variables.act = new Sigmoid();
 		//Variables.act = new Tanh();
-		Variables.learningRate = 0.2;
-		Variables.momentumRate = 0.5;
+		Variables.learningRate = 0.5;
+		Variables.momentumRate = 0.0;
 		Variables.wUpdate = new Backprop(Variables.learningRate, Variables.momentumRate);
 		//Variables.wUpdate = new RProp();
 		//Variables.wUpdate = new Quickprop();
 		
-		NeuralNet nn = new NeuralNet(64,10, new int[]{48,24});
-		//NeuralNet nn = new NeuralNet(9,2, new int[]{15, 15});
+		NeuralNet nn = new NeuralNet(64,10, new int[]{48});
+		//NeuralNet nn = new NeuralNet(4,2, new int[]{15, 15});
 		Dataset ds = new Dataset();
 		loadData(ds);
 		//loadTestingData(ds);

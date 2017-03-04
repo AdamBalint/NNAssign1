@@ -28,7 +28,7 @@ public class Layer {
 		else
 			weights = new Matrix(out, in);
 		
-		lastChange = new Matrix(weights.getRowDimension(), weights.getColumnDimension());
+		//lastChange = new Matrix(weights.getRowDimension(), weights.getColumnDimension());
 		//weightUpdate = new RProp(weights.getRowDimension(), weights.getColumnDimension());
 		//weightUpdate = new Quickprop();//new Quickprop(weights.getRowDimension(), weights.getColumnDimension());
 		//weightUpdate = new Backprop(0.05);

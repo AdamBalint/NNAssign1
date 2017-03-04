@@ -11,6 +11,7 @@ import dataManager.Dataset;
 import neuralNetwork.NeuralNet;
 import variables.Variables;
 import weightUpdate.Backprop;
+import weightUpdate.DeltaBarDelta;
 import weightUpdate.Quickprop;
 import weightUpdate.RProp;
 
@@ -24,7 +25,8 @@ public class Main {
 		Variables.momentumRate = 0.0;
 		Variables.wUpdate = new Backprop(Variables.learningRate, Variables.momentumRate);
 		//Variables.wUpdate = new RProp();
-		Variables.wUpdate = new Quickprop();
+		//Variables.wUpdate = new Quickprop();
+		//Variables.wUpdate = new DeltaBarDelta();
 		
 		NeuralNet nn = new NeuralNet(64,10, new int[]{48});
 		//NeuralNet nn = new NeuralNet(4,2, new int[]{15, 15});

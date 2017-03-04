@@ -5,7 +5,7 @@ import neuralNetwork.Layer;
 
 public class RProp extends WeightUpdate{
 
-	double etaPlus = 2.2, etaMinus = 0.5;
+	double etaPlus = 1.2, etaMinus = 0.5;
 	double deltaMax = 25, deltaMin = 1e-6;
 	Matrix lastGrad = null;
 	public Matrix changeMat;
@@ -79,8 +79,16 @@ public class RProp extends WeightUpdate{
 				else if (lastGrad.get(i, j) * grad.get(i, j) < 0){
 					changeMat.set(i, j, Math.max(changeMat.get(i, j)*etaMinus, deltaMin));
 					//grad.set(i, j, 0);
-					weightUpdate.set(i, j, -lastUpdate.get(i, j));
-					//weightUpdate.set(i, j, 0);
+					
+					
+					// with and without backtracking
+					//weightUpdate.set(i, j, -lastUpdate.get(i, j));
+					weightUpdate.set(i, j, 0);
+					
+					
+					
+					
+					
 					//weightUpdate.set(i, j, -Math.signum(grad.get(i, j)*changeMat.get(i, j)));
 					lastGrad.set(i, j, 0);
 				}
@@ -146,14 +154,6 @@ public class RProp extends WeightUpdate{
 
 	}
 
-	private double sumGradient(Matrix grad, int i) {
-		// TODO Auto-generated method stub
-		double sum = 0;
-		for (int j = 0; j < grad.getRowDimension(); j++){
-			sum += grad.get(j, i);
-		}
-		return sum;
-	}
 
 	@Override
 	public WeightUpdate copy(Layer l) {

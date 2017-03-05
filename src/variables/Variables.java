@@ -14,7 +14,7 @@ public class Variables {
 	public static int kValue = 5;
 	public static double momentumRate;
 	public static int seed = 0;
-	public static Random r = new Random(0);
+	public static Random r = new Random();
 	public static int hiddenNodeNum;
 	
 }

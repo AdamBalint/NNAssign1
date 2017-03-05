@@ -6,7 +6,7 @@ import neuralNetwork.Layer;
 public class RProp extends WeightUpdate{
 
 	double etaPlus = 1.2, etaMinus = 0.5;
-	double deltaMax = 25, deltaMin = 1e-6;
+	double deltaMax = 50, deltaMin = 1e-6;
 	Matrix lastGrad = null;
 	public Matrix changeMat;
 

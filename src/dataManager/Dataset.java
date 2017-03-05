@@ -6,8 +6,8 @@ import variables.Variables;
 
 public class Dataset {
 
-	private ArrayList<Data> training;
-	private ArrayList<Data> testing;
+	ArrayList<Data> training;
+	ArrayList<Data> testing;
 	private int trainingPointer = 0, testingPointer = 0;
 	private boolean bias = false;
 	private boolean kfold = false;
@@ -17,11 +17,11 @@ public class Dataset {
 	public Dataset(){
 		kfold = Variables.dataSplitMethod == 0 ? false : true;
 		if (kfold){
-			di = new KFoldIterator();
+			di = new KFoldIterator(this);
 			currentK = 0;
 			training = new ArrayList<Data>();
 		}else{
-			di = new HoldoutIterator();
+			di = new HoldoutIterator(this);
 			training = new ArrayList<Data>();
 			testing = new ArrayList<Data>();
 		}
@@ -46,7 +46,7 @@ public class Dataset {
 	}
 	
 	public Data nextTrainingExample(){
-		if (kfold && trainingPointer > step*(currentK) && trainingPointer < (currentK+1) * step){
+		/*if (kfold && trainingPointer > step*(currentK) && trainingPointer < (currentK+1) * step){
 			trainingPointer = (int)Math.ceil((currentK+1)*step);
 		}
 		if (trainingPointer >= training.size() || currentK == Variables.kValue-1){
@@ -55,25 +55,28 @@ public class Dataset {
 			shuffleTraining();
 		}
 		
-		return training.get(trainingPointer++);
+		return training.get(trainingPointer++);*/
+		return di.nextTrainingExample();
 	}
 	
 	public Data nextTestingExample(){
 		//if (kfold){
 			
-			
+			return di.nextTestingExample();
 		//}else{
-		testingPointer %= testing.size();
-		return testing.get(testingPointer++);
+		//testingPointer %= testing.size();
+		//return testing.get(testingPointer++);
 		//}
 	}
 	
 	public void shuffleTraining(){
-		Collections.shuffle(training, Variables.r);
+		if (training.size() != 0)
+			Collections.shuffle(training, Variables.r);
 	}
 	
 	public void shuffleTesting(){
-		Collections.shuffle(testing, Variables.r);
+		if (testing != null && testing.size() != 0)
+			Collections.shuffle(testing, Variables.r);
 	}
 
 	public void setBias(boolean b) {
@@ -82,12 +85,17 @@ public class Dataset {
 	}
 	
 	public int getTrainingSize(){
-		return training.size();
+		return di.getTrainingSize();
 	}
 	
 	public int getTestingSize(){
-		return testing.size();
+		return di.getTestingSize();
 	}
 	
-	
+	public boolean hasNextTrainingExample(){
+		return di.hasNextTrainingExample();
+	}
+	public boolean hasNextTestingExample(){
+		return di.hasNextTestingExample();
+	}
 }

@@ -1,5 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -17,45 +20,82 @@ import weightUpdate.RProp;
 
 
 public class Main {
-
-	public Main(){		
-		Variables.act = new Sigmoid();
+	public PrintWriter fw = null;
+	public Main(){	
+		String name = genName();
+		//Variables.act = new Sigmoid();
 		//Variables.act = new Tanh();
-		Variables.learningRate = 0.5;
-		Variables.momentumRate = 0.0;
-		Variables.wUpdate = new Backprop(Variables.learningRate, Variables.momentumRate);
+		//Variables.learningRate = 0.5;
+		//Variables.momentumRate = 0.0;
+		//Variables.wUpdate = new Backprop(Variables.learningRate, Variables.momentumRate);
 		//Variables.wUpdate = new RProp();
 		//Variables.wUpdate = new Quickprop();
 		//Variables.wUpdate = new DeltaBarDelta();
-		
-		NeuralNet nn = new NeuralNet(64,10, new int[]{48});
-		//NeuralNet nn = new NeuralNet(4,2, new int[]{15, 15});
-		Dataset ds = new Dataset();
-		loadData(ds);
-		//loadTestingData(ds);
-		//loadCancerData(ds);
-		//loadIrisData(ds);
-		long tStart = System.currentTimeMillis();
-		nn.train(ds);
-		ds.shuffleTesting();
-		int correct = 0, total = 0;
-		for (int i = 0; i < ds.getTestingSize(); i++){
-			Data d = ds.nextTestingExample();
-			Matrix ret = nn.evaluate(d);
-			System.out.println(Arrays.toString(ret.getRowPackedCopy()) + ", " + Arrays.toString(d.getOutputVector().getRowPackedCopy()));
-			for (int j = 0; j < ret.getRowDimension(); j++){
-				for (int k = 0; k < ret.getColumnDimension(); k++){
-					if (ret.get(j, k) == 1 && d.getOutputVector().get(j, k) == 1)
-						correct += 1;
+		try {
+			PrintWriter corOut = new PrintWriter("CorrectNum/"+name+"-CorrectClass.txt");
+			// loop here for runs for experiment
+			for(int run = 0; run < 20; run++){
+				
+					fw = new PrintWriter("Data/"+name+"-"+run+".txt");
+				
+				
+				NeuralNet nn = new NeuralNet(64,10, new int[]{Variables.hiddenNodeNum});
+				nn.setLogWriter(fw);
+				//NeuralNet nn = new NeuralNet(4,2, new int[]{15, 15});
+				Dataset ds = new Dataset();
+				loadData(ds);
+				System.out.println(ds.getTrainingSize());
+				//loadTestingData(ds);
+				//loadCancerData(ds);
+				//loadIrisData(ds);
+				long tStart = System.currentTimeMillis();
+				try{
+				nn.train(ds);
+				}catch(IOException e){
+					System.out.println("Failed to train network");
+					e.printStackTrace();
+					System.exit(1);
 				}
+				ds.shuffleTesting();
+				int correct = 0, total = 0;
+				while(ds.hasNextTestingExample()){
+					Data d = ds.nextTestingExample();
+					Matrix ret = nn.evaluate(d);
+					System.out.println(Arrays.toString(ret.getRowPackedCopy()) + ", " + Arrays.toString(d.getOutputVector().getRowPackedCopy()));
+					for (int j = 0; j < ret.getRowDimension(); j++){
+						for (int k = 0; k < ret.getColumnDimension(); k++){
+							if (ret.get(j, k) == 1 && d.getOutputVector().get(j, k) == 1)
+								correct += 1;
+						}
+					}
+					total += 1;
+				}
+				corOut.println(correct + "\t" + (((double)correct)/ds.getTestingSize()));
+				corOut.flush();
+				System.out.println("Correct: " + correct + " out of " + total);
+				long tEnd = System.currentTimeMillis();
+				long tDelta = tEnd - tStart;
+				double elapsedSeconds = tDelta / 1000.0;
+				System.out.println("Time to Complete: " + elapsedSeconds);
+				fw.close();
 			}
-			total += 1;
+			corOut.close();
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			System.err.println("File not found");
+			e1.printStackTrace();
+			System.exit(1);
 		}
-		System.out.println("Correct: " + correct + " out of " + total);
-		long tEnd = System.currentTimeMillis();
-		long tDelta = tEnd - tStart;
-		double elapsedSeconds = tDelta / 1000.0;
-		System.out.println("Time to Complete: " + elapsedSeconds);
+		try {
+			FileWriter out = new FileWriter("CompleteLog.txt");
+			out.append(name+"\n");
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		/*ds.setBias(false);
 		ds.addTrainingData(new Data(new double[]{0, 0, 0, 0}, new double[]{0, 1})); // 0
 		ds.addTrainingData(new Data(new double[]{1, 1, 0, 0}, new double[]{0, 1})); // 12
@@ -93,6 +133,27 @@ public class Main {
 		System.out.println("Correct: " + correct + " out of " + total);*/
 	}
 	
+	private String genName() {
+		// TODO Auto-generated method stub
+		String s = "";
+		// learning_type-act-(hold/k#)-(learning_type_params)
+		if(Variables.wUpdate.getClass() == Backprop.class)
+			s += "bp-";
+		else
+			s += "rp-";
+		if(Variables.act.getClass() == Sigmoid.class)
+			s += "sig-";
+		else
+			s += "tanh";
+		if (Variables.dataSplitMethod == 0)
+			s += "hold-lr"+Variables.learningRate +"-mr" + Variables.momentumRate + "-";
+		else
+			s += "k" + Variables.kValue + "-";
+		s += "h"+Variables.hiddenNodeNum;
+		
+		return s;
+	}
+
 	public void loadTestingData(Dataset ds){
 		ds.addTrainingData(new Data(new double[]{0, 0, 0, 0}, new double[]{0, 1})); // 0
 		ds.addTrainingData(new Data(new double[]{1, 1, 0, 0}, new double[]{0, 1})); // 12
@@ -198,6 +259,50 @@ public class Main {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		System.out.println(args.length);
+		System.out.println(Arrays.toString(args));
+		if(args.length >= 2){
+			// bp hidden_node_num activation_function data_split lr mr (k_value)
+			if(args[0].equalsIgnoreCase("bp")){
+				if(args.length >= 6){
+					Variables.hiddenNodeNum = Integer.parseInt(args[1]);
+					Variables.learningRate = Double.parseDouble(args[4]);
+					Variables.momentumRate = Double.parseDouble(args[5]);
+					Variables.wUpdate = new Backprop(Variables.learningRate, Variables.momentumRate);
+					Variables.act = args[2].equalsIgnoreCase("0") ? new Sigmoid() : new Tanh();
+					Variables.dataSplitMethod = Integer.parseInt(args[3]);
+					if(Variables.dataSplitMethod == 1){
+						Variables.kValue = Integer.parseInt(args[6]);
+					}
+				}
+				else{
+					System.err.println("Not enough parameters for backprop");
+					System.exit(1);
+				}
+			}
+			else if (args[0].equalsIgnoreCase("rprop")){
+				// rprop hidden_node_num activation_function data_split (k_value)
+				if(args.length >= 4){
+					Variables.wUpdate = new RProp();
+					Variables.hiddenNodeNum = Integer.parseInt(args[1]);
+					Variables.act = args[2].equalsIgnoreCase("0") ? new Sigmoid() : new Tanh();
+					Variables.dataSplitMethod = Integer.parseInt(args[3]);
+					if(Variables.dataSplitMethod == 1){
+						Variables.kValue = Integer.parseInt(args[4]);
+					}
+				}
+				else{
+					System.err.println("Not enough parameters for rprop");
+					System.exit(1);
+				}
+			} 
+			else{
+				System.out.println("Incorrect training method");
+				System.exit(1);
+			}
+		}
+		
+		
 		new Main();
 	}
 

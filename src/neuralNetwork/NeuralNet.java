@@ -102,7 +102,7 @@ public class NeuralNet {
 			
 			fw.println(mse/data + "\t" + testMSE/ds.getTestingSize());
 			fw.flush();
-			System.err.println(mse/data);
+			//System.err.println(mse/data);
 		}
 	}
 	
